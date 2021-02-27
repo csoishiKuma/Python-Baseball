@@ -7,7 +7,6 @@ plays.columns = ['type', 'inning', 'team', 'player', 'count', 'pitches', 'event'
 plays = plays[plays.loc[:,'event'].str.contains('^(?:S(?!B)|D|T|HR)')]
 hits = plays[['inning', 'event']]
 hits.loc[:, ['inning']].apply(pd.to_numeric)
-print(hits)
 
 replacements = {
     "r'^S(.*)'": 'single',
@@ -16,4 +15,3 @@ replacements = {
     "r'^HR(.*)'": 'hr'
 }
 hit_type = hits[hits['event']].replace(replacements, regex=True)
-print(hit_type)
