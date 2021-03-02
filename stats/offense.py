@@ -16,5 +16,5 @@ replacements = {
     "r'^HR(.*)'": 'hr'
 }
 
-hit_type = hits['event'].replace(replacements, regex=True)
+hit_type = hits[hits['event']].replace(replacements, regex=True)
 print(hit_type)
