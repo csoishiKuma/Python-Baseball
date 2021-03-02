@@ -5,16 +5,20 @@ from data import games
 plays = games[games['type'] == 'play']
 plays.columns = ['type', 'inning', 'team', 'player', 'count', 'pitches', 'event', 'game_id', 'year']
 # print(plays)
-hits = plays.loc[plays['event'].str.contains('^(?:S(?!B)|D|T|HR)')]
-hits = hits[['inning', 'event']]
-hits['inning'] = pd.to_numeric(hits.loc[:, 'inning'])
-# print(hits)
+hits = plays.loc[plays['event'].str.contains('^(?:S(?!B)|D|T|HR)'), ['inning', 'event']]
+hits.loc[:, 'inning'] = pd.to_numeric(hits.loc[:, 'inning'])
 replacements = {
-    "r'^S(.*)'": 'single',
-    "r'^D(.*)'": 'double',
-    "r'^T(.*)'": 'triple',
-    "r'^HR(.*)'": 'hr'
+    r'^S(.*)': 'single',
+    r'^D(.*)': 'double',
+    r'^T(.*)': 'triple',
+    r'^HR(.*)': 'hr'
 }
 
-hit_type = hits[hits['event']].replace(replacements, regex=True)
-print(hit_type)
+hit_type = hits['event'].replace(replacements, regex=True)
+# print(hit_type)
+hits = hits.assign(hit_type=hit_type)
+hits = hits.groupby(['inning', 'hit_type']).size().reset_index().rename(columns={hits.index.name:'count'})
+hits = pd.Categorical(hits['hit_type'], ['single', 'double', 'triple', 'hr'])
+hits = hits.sort_values(['inning', 'hit_type'])
+# hits = hits.pivot(index='inning', columns='hit_type', values='count')
+print(hits)
